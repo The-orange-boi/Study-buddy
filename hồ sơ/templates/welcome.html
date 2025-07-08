@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chào mừng đến với Study Buddy</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        .welcome-container {
+            background-color: #ffffff;
+            padding: 40px 50px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+        }
+        .welcome-container h1 {
+            color: #0d6efd;
+            margin-bottom: 15px;
+            font-size: 2.2em;
+        }
+        .welcome-container p {
+            color: #555;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+        .welcome-actions a {
+            display: block;
+            text-decoration: none;
+            color: white;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            font-size: 1.1em;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            font-weight: 500;
+        }
+        .welcome-actions a:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        .btn-login {
+            background-color: #007bff;
+        }
+        .btn-register {
+            background-color: #28a745;
+        }
+        .btn-guest {
+            background-color: #6c757d;
+        }
+        .btn-guest:hover {
+             background-color: #5a6268;
+        }
+         /* Flashed messages styling */
+        .flashes { list-style-type: none; padding-left: 0; margin-top: 20px; }
+        .flashes li { padding: 10px 15px; margin-bottom: 10px; border-radius: 4px; font-size: 0.95em; text-align: left; }
+        .flashes .success { background-color: #d1e7dd; color: #0f5132; border: 1px solid #badbcc;}
+        .flashes .warning { background-color: #fff3cd; color: #664d03; border: 1px solid #ffecb5;}
+        .flashes .danger { background-color: #f8d7da; color: #842029; border: 1px solid #f5c2c7;}
+        .flashes .info { background-color: #cfe2ff; color: #084298; border: 1px solid #b6d4fe;}
+
+    </style>
+</head>
+<body>
+    <div class="welcome-container">
+        <h1>Study Buddy</h1>
+        <p>Ứng dụng hỗ trợ học tập hiệu quả của bạn. <br>Đăng nhập hoặc đăng ký để lưu tiến trình (trong tương lai!), hoặc tiếp tục với tư cách khách.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <div class="welcome-actions" style="margin-top: 20px;">
+            <a href="{{ url_for('login') }}" class="btn-login">Đăng Nhập</a>
+            <a href="{{ url_for('register') }}" class="btn-register">Đăng Ký Tài Khoản Mới</a>
+            <a href="{{ url_for('home_app') }}" class="btn-guest">Tiếp Tục Không Cần Đăng Nhập</a>
+        </div>
+    </div>
+</body>
+</html>

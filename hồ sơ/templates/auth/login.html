@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng nhập - Study Buddy</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .auth-container {
+            max-width: 400px;
+            margin: 20px;
+            padding: 30px 40px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .auth-container h1 {
+            text-align: center;
+            color: #0d6efd;
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="password"] {
+            width: 100%; /* Adjusted for box-sizing */
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            box-sizing: border-box; /* Important for width 100% */
+            font-size: 1em;
+        }
+        .form-group input[type="checkbox"] {
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+        .form-group .checkbox-label {
+            font-weight: normal;
+            font-size: 0.9em;
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background-color: #0d6efd;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1.05em;
+            transition: background-color 0.2s ease;
+        }
+        .btn-submit:hover {
+            background-color: #0b5ed7;
+        }
+        .auth-links {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+        }
+        .auth-links a {
+            color: #0d6efd;
+            text-decoration: none;
+        }
+        .auth-links a:hover {
+            text-decoration: underline;
+        }
+        .flashes { list-style-type: none; padding-left: 0; margin-bottom: 15px;}
+        .flashes li { padding: 10px 15px; margin-bottom: 10px; border-radius: 4px; font-size: 0.95em; }
+        .flashes .success { background-color: #d1e7dd; color: #0f5132; border: 1px solid #badbcc;}
+        .flashes .warning { background-color: #fff3cd; color: #664d03; border: 1px solid #ffecb5;}
+        .flashes .danger { background-color: #f8d7da; color: #842029; border: 1px solid #f5c2c7;}
+        .flashes .info { background-color: #cfe2ff; color: #084298; border: 1px solid #b6d4fe;}
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <h1>Đăng Nhập</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        <form method="POST" action="{{ url_for('login') }}">
+            <div class="form-group">
+                <label for="username">Tên đăng nhập:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Mật khẩu:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="form-group" style="display: flex; align-items: center;">
+                <input type="checkbox" id="remember" name="remember" style="width: auto; margin-right: 8px;">
+                <label for="remember" class="checkbox-label">Ghi nhớ đăng nhập</label>
+            </div>
+            <button type="submit" class="btn-submit">Đăng Nhập</button>
+        </form>
+        <div class="auth-links">
+            <p>Chưa có tài khoản? <a href="{{ url_for('register') }}">Đăng ký ngay</a></p>
+            <p><a href="{{ url_for('welcome') }}">Quay lại trang chào mừng</a></p>
+        </div>
+    </div>
+</body>
+</html>

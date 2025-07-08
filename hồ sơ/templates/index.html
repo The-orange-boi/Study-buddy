@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Buddy - Hỗ Trợ Học Tập</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header id="toolbar">
+        <div class="toolbar-content">
+            <a href="{{ url_for('home_app') }}" id="brandLink" class="brand">
+                <i class="fas fa-graduation-cap"></i> Study Buddy
+            </a>
+            <nav class="main-nav">
+                <a href="#" id="startPageLink" class="nav-link"><i class="fas fa-home"></i> Bắt Đầu</a>
+                {% if current_user.is_authenticated %}
+                <a href="#" id="myQuizzesPageLink" class="nav-link"><i class="fas fa-list-alt"></i> Bài Của Tôi</a>
+                {% endif %}
+                <a href="#" id="editQuizPageLink" class="nav-link toolbar-link-disabled"><i class="fas fa-edit"></i> Chỉnh Sửa</a>
+                <a href="#" id="takeQuizPageLink" class="nav-link toolbar-link-disabled"><i class="fas fa-play-circle"></i> Làm Bài</a>
+                <a href="#" id="studyGuidePageLink" class="nav-link toolbar-link-disabled"><i class="fas fa-book-reader"></i> Ôn Tập</a>
+                <a href="#" id="saveQuizLink" class="nav-link toolbar-link-disabled"><i class="fas fa-save"></i> Lưu Bài</a>
+            </nav>
+            <!-- Timer moved here -->
+            <div id="quizTimerDisplay" class="quiz-timer timer-inactive">
+                <i class="fas fa-clock"></i> <span>Thời gian: 00:00:00</span>
+            </div>
+            <div class="toolbar-user-actions">
+                <div id="userAuthLinks" class="user-auth">
+                    {% if current_user.is_authenticated %}
+                        <span class="user-greeting">Chào, {{ current_user.username }}!</span>
+                        <a href="{{ url_for('logout') }}" class="btn btn-logout"><i class="fas fa-sign-out-alt"></i> Đăng Xuất</a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}?next={{ url_for('home_app') }}" class="btn btn-login"><i class="fas fa-sign-in-alt"></i> Đăng Nhập</a>
+                        <a href="{{ url_for('register') }}?next={{ url_for('home_app') }}" class="btn btn-register"><i class="fas fa-user-plus"></i> Đăng Ký</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main id="container">
+        <div id="flashedMessagesContainer">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul class="flashes">
+                    {% for category, message in messages %}
+                        <li class="flash-message {{ category }}">{{ message }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        <div id="status" class="status-bar status-info">Trạng thái: Sẵn sàng</div>
+
+        <section id="startPageSection" class="page-section">
+            <div class="page-header">
+                <h1><i class="fas fa-rocket"></i> Chào mừng đến Study Buddy</h1>
+                <p class="subtitle">- Ứng dụng hỗ trợ học tập hiệu quả của bạn -</p>
+            </div>
+            <h4><i class="fas fa-star"></i> Tính năng chính:</h4>
+            <ul class="features-list">
+                <li><i class="fas fa-camera-retro"></i> Xử lý ảnh: Trích xuất câu hỏi trắc nghiệm từ ảnh ĐỀ THI.</li>
+                <li><i class="fas fa-book"></i> Tạo câu hỏi từ ảnh HƯỚNG DẪN (văn bản).</li>
+                <li><i class="fas fa-pencil-alt"></i> Chỉnh sửa: Sửa đổi câu hỏi và đáp án.</li>
+                <li><i class="fas fa-tasks"></i> Làm bài: Thực hiện bài kiểm tra (có đếm giờ).</li>
+                <li><i class="fas fa-check-double"></i> Chấm điểm: Xem kết quả, đáp án và thời gian làm bài.</li>
+                <li><i class="fas fa-lightbulb"></i> Hướng dẫn ôn tập: Tạo tóm tắt kiến thức từ bài làm.</li>
+                <li><i class="fas fa-cloud-upload-alt"></i> Lưu bài vào tài khoản (khi đăng nhập).</li>
+                <li><i class="fas fa-download"></i> Tải bài về máy (khách).</li>
+                <li><i class="fas fa-folder-open"></i> Tải bài từ tài khoản (khi đăng nhập), xem tiến độ.</li>
+            </ul>
+            <div id="inputMethodsSubSection" class="input-methods">
+                 <h2><i class="fas fa-cogs"></i> 1. Chuẩn bị dữ liệu</h2>
+                 <div class="input-option card">
+                     <h4><i class="fas fa-image"></i> Cách 1: Trích xuất câu hỏi từ ảnh ĐỀ THI</h4>
+                     <label for="imageInput">Chọn ảnh bài kiểm tra (có sẵn câu hỏi):</label>
+                     <input type="file" id="imageInput" class="form-control-file" accept="image/*">
+                     <button id="processButton" class="btn btn-primary"><i class="fas fa-cogs"></i> Xử lý ảnh đề thi</button>
+                 </div>
+
+                 <div class="or-divider-container">
+                    <hr class="or-divider-line"><span class="or-divider-text">HOẶC</span><hr class="or-divider-line">
+                 </div>
+                 <div class="input-option card">
+                     <h4><i class="fas fa-book"></i> Cách 2: Tạo câu hỏi từ ảnh HƯỚNG DẪN ÔN TẬP</h4>
+                     <label for="guideImageInput">Chọn ảnh hướng dẫn ôn tập (chỉ chứa văn bản):</label>
+                     <input type="file" id="guideImageInput" class="form-control-file" accept="image/*">
+                     <div style="margin-top: 10px; margin-bottom: 10px;">
+                        <label for="numQuestionsToGenerate" style="font-weight: normal; font-size: 0.9em;">Số câu hỏi muốn tạo (1-10):</label>
+                        <input type="number" id="numQuestionsToGenerate" class="form-control-inline" value="5" min="1" max="10" style="width: 70px; padding: 0.3rem 0.5rem; display:inline-block; margin-left: 5px;">
+                     </div>
+                     <button id="generateQuestionsFromGuideButton" class="btn btn-info"><i class="fas fa-question-circle"></i> Tạo câu hỏi từ hướng dẫn</button>
+                 </div>
+
+                 <div class="or-divider-container">
+                    <hr class="or-divider-line"><span class="or-divider-text">HOẶC</span><hr class="or-divider-line">
+                 </div>
+                 {% if not current_user.is_authenticated %}
+                 <div class="input-option card">
+                     <h4><i class="fas fa-file-upload"></i> Cách 3: Tải từ tệp đã lưu (khách)</h4>
+                     <label for="loadJsonInput">Chọn tệp bài kiểm tra đã lưu (.quizdata):</label>
+                     <input type="file" id="loadJsonInput" class="form-control-file" accept=".json,application/json,.quizdata">
+                 </div>
+                 {% else %}
+                 <div class="input-option card">
+                     <h4><i class="fas fa-file-upload"></i> Cách 3: Tải từ tệp cục bộ (.quizdata)</h4>
+                     <label for="loadJsonInputLoggedIn">Tải lên bài kiểm tra từ máy tính:</label>
+                     <input type="file" id="loadJsonInputLoggedIn" class="form-control-file" accept=".json,application/json,.quizdata">
+                 </div>
+                 {% endif %}
+            </div>
+        </section>
+
+        <section id="myQuizzesPageSection" class="page-section hidden">
+            <div class="page-header"><h2><i class="fas fa-archive"></i> Bài Kiểm Tra Đã Lưu Của Tôi</h2></div>
+            <div id="myQuizzesListContainer"><p><em>Đang tải danh sách bài kiểm tra...</em></p></div>
+            <div id="myQuizzesActions" class="page-actions">
+                <button id="refreshMyQuizzesButton" class="btn btn-secondary"><i class="fas fa-sync-alt"></i> Làm mới</button>
+            </div>
+        </section>
+
+        <section id="editQuizPageSection" class="page-section hidden">
+            <div class="page-header"><h2><i class="fas fa-edit"></i> Chỉnh sửa bài kiểm tra</h2></div>
+            <div id="editQuizContent" class="quiz-editor-area"></div>
+            <div id="editControlsContainer" class="page-actions"></div>
+        </section>
+
+        <section id="studyGuidePageSection" class="page-section hidden">
+            <div class="page-header"><h2><i class="fas fa-book-open"></i> Hướng dẫn ôn tập</h2></div>
+            <div id="studyGuideOutput" class="content-box markdown-content"><p><em>Vui lòng chuẩn bị dữ liệu...</em></p></div>
+            <div class="page-actions">
+                <button id="generateStudyGuideAction" class="btn btn-success hidden"><i class="fas fa-magic"></i> Tạo hướng dẫn</button>
+            </div>
+        </section>
+
+        <section id="takeQuizPageSection" class="page-section hidden">
+            <div class="page-header"><h2><i class="fas fa-question-circle"></i> Làm bài kiểm tra</h2></div>
+            <div id="quizContainer" class="quiz-area"><p><em>Vui lòng chuẩn bị dữ liệu...</em></p></div>
+            <div id="controlsContainer" class="page-actions hidden">
+                <button id="gradeButton" class="btn btn-success btn-lg"><i class="fas fa-check-circle"></i> Nộp Bài & Chấm điểm</button>
+            </div>
+            <div id="resultsContainer" class="results-area hidden">
+                <div id="quizStatsSummary" class="card">
+                    <h3><i class="fas fa-poll"></i> Tổng Kết Bài Làm</h3>
+                    <p><strong>Tổng số câu:</strong> <span id="statsTotal">--</span></p>
+                    <p><strong>Số câu đúng:</strong> <span id="statsCorrect">--</span></p>
+                    <p><strong>Số câu sai:</strong> <span id="statsIncorrect">--</span></p>
+                    <p><strong>Tỷ lệ chính xác:</strong> <span id="statsAccuracy">--</span>%</p>
+                    <p><strong>Thời gian làm bài:</strong> <span id="statsTimeTaken">--:--:--</span></p>
+                </div>
+                <div id="detailedResults"></div>
+                <div id="resultsActionsContainer" class="page-actions"></div>
+            </div>
+        </section>
+
+        <section id="finalJsonOutputSection" class="page-section hidden">
+             <div class="page-header"><h2><i class="fas fa-code"></i> Dữ liệu bài kiểm tra (JSON)</h2></div>
+            <pre id="outputJsonText" class="code-block"></pre>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <p>© {{ current_year }} Study Buddy. Mọi quyền được bảo lưu.</p>
+    </footer>
+
+    <script>
+        const IS_USER_AUTHENTICATED = {{ current_user.is_authenticated | tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
